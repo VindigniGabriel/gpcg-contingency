@@ -1,4 +1,20 @@
 <template>
+<v-container>
+<v-layout>
+        <v-flex>
+          <v-card  
+              >
+                <v-card-title primary-title dark>
+                  <div>
+                    <h3 class="headline mb-0 font-weight-light font-italic">
+                      <v-icon>
+                        person_add
+                      </v-icon>
+                      Registro de Usuario
+                    </h3>
+                  </div>
+                </v-card-title>
+
 <div>
   <v-container fluid>
     <v-layout  align-start justify-center row fill-height wrap>
@@ -115,7 +131,6 @@
                             v-model="editedItem.new"
                             label="Línea Nueva"
                             color="blue"
-                            @change="lineNew"
                           ></v-checkbox>
                         </v-flex>
                         <v-flex xs12 sm6 v-if="!editedItem.new">
@@ -144,18 +159,18 @@
                             :items="typeLine"
                             label="Tipo de Línea"
                             color="blue"
+                            @blur="changeTypeLine"
                           ></v-select>
                         </v-flex>
                         <v-flex xs12>
                           <v-select
                             v-model="editedItem.requests"
-                            :items="requests"
+                            :items="requestsDynamic"
                             label="Requerimiento(s)"
                             multiple
                             chips
                             persistent-hint
                             color="blue"
-                            
                           ></v-select>
                         </v-flex>
                         <v-flex xs12 sm6>
@@ -296,6 +311,10 @@
       </v-container>
     </div>
   </div>
+  </v-card>
+        </v-flex>
+</v-layout>
+</v-container>
 </template> 
 <script>
 import moment from 'moment'
@@ -324,11 +343,7 @@ export default {
       text: 'Recuerde Actualizar Registro(s)',
       updated: false,
       hora: 'date.now()',
-      typeLine: [
-        'Pre/GSM',
-        'Pre/CDMA',
-        'Crédito'
-      ],
+      typeLine: [],
       mask: 'phone',
       userName: 'Titular de la cédula de identidad',
       showField: true,
@@ -357,7 +372,7 @@ export default {
         requests: '',
         phone: 416,
         new: false,
-        typeLine: '',
+        typeLine: [],
         contact: 212,
         status: 'Pendiente',
         ocm: '',
@@ -369,7 +384,7 @@ export default {
         requests: '',
         phone: 416,
         new: false,
-        typeLine: '',
+        typeLine: [],
         contact: 212,
         status: 'Pendiente',
         ocm: '',
@@ -403,9 +418,16 @@ export default {
       }
     },
   computed:{
-    intro(){
-      return this.searchIdentify.length < 2 && !this.dataUser
+    requestsDynamic: (data) => {
+      if(data.editedItem.new){
+        data.editedItem.phone = '1'
+        return ['Línea Nueva']
+      }else{
+        data.editedItem.phone = '416'
+        return data.requests
+      }
     },
+    intro: data => data.searchIdentify.length < 2 && !data.dataUser,
     validateAdd(){
       return (this.editedItem.requests.length > 0 && this.editedItem.typeLine !== '' && this.editedItem.contact.length == 10 && (this.editedItem.phone.length === 1 || this.editedItem.phone.length === 10 )) ? true : false
     },
@@ -455,6 +477,20 @@ export default {
       }
   },
   methods: {
+    changeTypeLine(){
+      this.requests = []
+      const key = this.typeLine.indexOf(this.editedItem.typeLine)
+        if(key > -1){
+          firebase.database().ref('settings/options')
+            .on('value', request => {
+              for(let k in request.val()){
+                if(request.val()[k][key]){
+                  this.requests.push(k)
+                }
+              }
+            })
+        }
+    },
     updateDate(){
       this.addRequests()
       this.editedItem.date =  moment().format("YYYY-MM-DD HH:mm:ss")
@@ -469,25 +505,12 @@ export default {
       this.updated = true,
       this.intro = true
     },
-    lineNew(){
-      if(this.editedItem.new){
-        this.editedItem.requests = []
-        this.requests = [
-          'Línea Nueva'
-        ],
-        this.editedItem.phone = '1'
-      }else{
-        this.editedItem.requests = []
-        this.editedItem.phone = '(416)'
-        this.addRequests()
-      }
-    },
     initialize (val) {
-      this.requests = []
-      val.forEach( valor => this.requests.push(valor))
+      this.typeLine = []
+      val.forEach( valor => this.typeLine.push(valor))
     },
     addRequests(){
-      firebase.database().ref('settings/requests').on('value', snapshot => this.initialize(snapshot.val()))
+      firebase.database().ref('settings/typeLine').on('value', snapshot => this.initialize(snapshot.val()))
     },
     deleteItem (item, key) {
       const index = this.records.indexOf(item)

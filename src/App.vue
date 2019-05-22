@@ -25,19 +25,23 @@
       </v-list>
     </v-navigation-drawer>
     <v-toolbar
-      color="deep-orange lighten-1"
+      color="#f48342"
       dense
       fixed
       clipped-left
       app
     >
       <v-toolbar-side-icon @click.stop="drawer = !drawer" app></v-toolbar-side-icon>
-      <v-icon class="mx-3">fab fa-youtube</v-icon>
+     
       <v-toolbar-title class="mr-5 align-center">
         <span class="title">GerenciaPCG</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-     
+      <v-avatar
+        size="40px"
+      >
+        <img src="https://pbs.twimg.com/profile_images/855250504464703490/mrIeA3nU_400x400.jpg" alt="avatar">
+      </v-avatar>
     </v-toolbar>
     <v-content>
       <router-view/>
@@ -90,9 +94,6 @@
 </template>
 
 <script>
-
-import firebase from 'firebase'
-
   export default {
     name: 'App',
     data() {
@@ -103,7 +104,7 @@ import firebase from 'firebase'
         { icon: 'home', text: 'Registrar', url: '/' },
         { icon: 'group', text: 'Historial de la OC', url: '/list' },
         { icon: 'insert_chart', text: 'Estadísticas', url: '/chart' },
-        { icon: 'settings', text: 'Configuraciones', url: '/about' },
+        { icon: 'settings', text: 'Configuraciones', url: '/settings' },
         { icon: 'help', text: 'Ayuda', url: '/help' },
         { icon: 'help', text: 'Excel', url: '/excel' },
         { icon: 'help', text: 'Date', url: '/date' },

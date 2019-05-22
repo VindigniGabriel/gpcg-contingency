@@ -1,24 +1,29 @@
 <template>
     <v-container>
-          <v-layout
-            align-end justify-end
-            column
-            wrap
-            >
-            <v-flex xs12 v-if="notifycationView">
-                <v-spacer></v-spacer>
-                <v-badge
-                color="success"
-                >
-                <template v-slot:badge>
-                    <span>{{notifycationCount}}</span>
-                </template>
-                <v-btn outline fab color="teal" @click="reload">
-                    <v-icon>list</v-icon>
-                </v-btn>
-                </v-badge>
-            </v-flex>
-            </v-layout>
+        <v-layout>
+        <v-flex>
+          <v-card  
+              >
+                <v-card-title primary-title dark>
+                    <div>
+                        <h3 class="headline mb-0 font-weight-light font-italic">
+                        <v-icon>
+                            list
+                        </v-icon>
+                            Historial de la OC
+                        </h3>
+                    </div>
+                    <v-spacer></v-spacer>
+                    <v-badge
+                        color="success"
+                        v-if="notifycationView"
+                    >
+                        <span class="font-weight-regular font-italic">Se ha(n) registrado <strong>{{notifycationCount}}</strong> cambio(s) en el Historial</span>
+                        <v-btn outline small fab color="teal" @click="reload">
+                            <v-icon>list</v-icon>
+                        </v-btn>
+                    </v-badge>
+                </v-card-title>
         <v-layout>
             <v-flex>
                 <v-card>
@@ -136,6 +141,9 @@
                 </v-dialog>
             </v-layout>
         </template>
+                </v-card>
+            </v-flex>
+          </v-layout>
     </v-container>
 </template>
 
