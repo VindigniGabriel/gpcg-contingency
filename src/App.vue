@@ -103,11 +103,9 @@
       items: [
         { icon: 'home', text: 'Registrar', url: '/' },
         { icon: 'group', text: 'Historial de la OC', url: '/list' },
-        { icon: 'insert_chart', text: 'Estadísticas', url: '/chart' },
+        { icon: 'insert_chart', text: 'Gráficos', url: '/chart' },
         { icon: 'settings', text: 'Configuraciones', url: '/settings' },
-        { icon: 'help', text: 'Ayuda', url: '/help' },
-        { icon: 'help', text: 'Excel', url: '/excel' },
-        { icon: 'help', text: 'Date', url: '/date' },
+        { icon: 'help', text: 'Ayuda', url: '/help' }
       ],
       items2: [
         { picture: 28, text: 'Joseph' },

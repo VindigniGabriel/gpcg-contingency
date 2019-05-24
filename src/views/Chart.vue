@@ -1,7 +1,24 @@
 <template>
-    <v-container>
-        <v-layout wrap row>
-            <v-flex xs12 lg5 mb-3>
+    <v-container grid-list-lg>
+       <v-layout>
+        <v-flex>
+          <v-card  
+              >
+                <v-card-title primary-title dark>
+                  <div>
+                    <h3 class="headline mb-0 font-weight-light font-italic">
+                      <v-icon>
+                        insert_chart
+                      </v-icon>
+                      Gráficos
+                    </h3>
+                  </div>
+                </v-card-title>
+        <v-layout 
+          wrap 
+          row 
+          :class="{'ma-4': $vuetify.breakpoint.smAndUp}">
+            <v-flex xs12 lg6>
                 <v-card  
                 color="light-green lighten-4"
               >
@@ -15,7 +32,8 @@
                   <v-spacer></v-spacer>
                   <v-btn 
                     flat
-                    dark 
+                    dark
+                    @click="downloadExcelNow"
                   >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24px" height="24px">
                     <path d="M 12 3 L 2 5 L 2 19 L 12 21 L 12 3 z M 14 5 L 14 7 L 16 7 L 16 9 L 14 9 L 14 11 L 16 11 L 16 13 L 14 13 L 14 15 L 16 15 L 16 17 L 14 17 L 14 19 L 21 19 C 21.552 19 22 18.552 22 18 L 22 6 C 22 5.448 21.552 5 21 5 L 14 5 z M 18 7 L 20 7 L 20 9 L 18 9 L 18 7 z M 4.1757812 8.296875 L 5.953125 8.296875 L 6.8769531 10.511719 C 6.9519531 10.692719 7.0084063 10.902625 7.0664062 11.140625 L 7.0917969 11.140625 C 7.1247969 10.997625 7.1919688 10.779141 7.2929688 10.494141 L 8.3222656 8.296875 L 9.9433594 8.296875 L 8.0078125 11.966797 L 10 15.703125 L 8.2714844 15.703125 L 7.1582031 13.289062 C 7.1162031 13.204062 7.0663906 13.032922 7.0253906 12.794922 L 7.0097656 12.794922 C 6.9847656 12.908922 6.934375 13.079594 6.859375 13.308594 L 5.7363281 15.703125 L 4 15.703125 L 6.0605469 11.996094 L 4.1757812 8.296875 z M 18 11 L 20 11 L 20 13 L 18 13 L 18 11 z M 18 15 L 20 15 L 20 17 L 18 17 L 18 15 z"/>
@@ -29,30 +47,29 @@
               </v-card-actions>
               </v-card>
             </v-flex>
-            <v-flex xs12 lg5 offset-lg2>
+            <v-flex xs12 lg6>
               <v-card  
                 color="teal lighten-4"
               >
                 <v-card-title primary-title dark>
-                  <h3 class="headline mb-0">Monitor por Fecha</h3>
+                  <h3 class="headline mb-0">Monitor por Rango</h3>
                   <v-spacer></v-spacer>
                   <v-date-picker
+                    @click="sendDateRange"
                     mode='range'
                     v-model='selectedDate'
-                    :disabled-dates='[
-                      {
-                        start: new Date(),
-                        end: null
-                      }]'
+                    :max-date='new Date()'
+                    left-start
                     show-caps>
                   </v-date-picker>
                 </v-card-title>
-                <highcharts :options="chartOptionsNow"></highcharts>
+                <highcharts :options="chartOptionsRange"></highcharts>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn 
                     flat
                     dark 
+                    @click="downloadExcelRange"
                   >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24px" height="24px">
                     <path d="M 12 3 L 2 5 L 2 19 L 12 21 L 12 3 z M 14 5 L 14 7 L 16 7 L 16 9 L 14 9 L 14 11 L 16 11 L 16 13 L 14 13 L 14 15 L 16 15 L 16 17 L 14 17 L 14 19 L 21 19 C 21.552 19 22 18.552 22 18 L 22 6 C 22 5.448 21.552 5 21 5 L 14 5 z M 18 7 L 20 7 L 20 9 L 18 9 L 18 7 z M 4.1757812 8.296875 L 5.953125 8.296875 L 6.8769531 10.511719 C 6.9519531 10.692719 7.0084063 10.902625 7.0664062 11.140625 L 7.0917969 11.140625 C 7.1247969 10.997625 7.1919688 10.779141 7.2929688 10.494141 L 8.3222656 8.296875 L 9.9433594 8.296875 L 8.0078125 11.966797 L 10 15.703125 L 8.2714844 15.703125 L 7.1582031 13.289062 C 7.1162031 13.204062 7.0663906 13.032922 7.0253906 12.794922 L 7.0097656 12.794922 C 6.9847656 12.908922 6.934375 13.079594 6.859375 13.308594 L 5.7363281 15.703125 L 4 15.703125 L 6.0605469 11.996094 L 4.1757812 8.296875 z M 18 11 L 20 11 L 20 13 L 18 13 L 18 11 z M 18 15 L 20 15 L 20 17 L 18 17 L 18 15 z"/>
@@ -78,27 +95,33 @@
                     <h3 class="headline mb-0">Historial</h3>
                   </div>
                 </v-card-title>
+                <highcharts :options="chartActions"></highcharts>
+                <v-card-actions>
+                </v-card-actions>
+              </v-card>
+            </v-flex>
+            <v-flex xs12>
+                <v-divider></v-divider>
+            </v-flex>
+            <v-flex xs12>
+              <v-card  
+                color="blue lighten-4"
+              >
+                <v-card-title primary-title dark>
+                  <v-spacer></v-spacer>
+                  <div>
+                    <h3 class="headline mb-0">Historial</h3>
+                  </div>
+                </v-card-title>
                 <highcharts :options="chartOptionsHistory"></highcharts>
                 <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn 
-                    flat
-                    dark 
-                    color="deep-orange darken-1"
-                  >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24px" height="24px">
-                    <path d="M 12 3 L 2 5 L 2 19 L 12 21 L 12 3 z M 14 5 L 14 7 L 16 7 L 16 9 L 14 9 L 14 11 L 16 11 L 16 13 L 14 13 L 14 15 L 16 15 L 16 17 L 14 17 L 14 19 L 21 19 C 21.552 19 22 18.552 22 18 L 22 6 C 22 5.448 21.552 5 21 5 L 14 5 z M 18 7 L 20 7 L 20 9 L 18 9 L 18 7 z M 4.1757812 8.296875 L 5.953125 8.296875 L 6.8769531 10.511719 C 6.9519531 10.692719 7.0084063 10.902625 7.0664062 11.140625 L 7.0917969 11.140625 C 7.1247969 10.997625 7.1919688 10.779141 7.2929688 10.494141 L 8.3222656 8.296875 L 9.9433594 8.296875 L 8.0078125 11.966797 L 10 15.703125 L 8.2714844 15.703125 L 7.1582031 13.289062 C 7.1162031 13.204062 7.0663906 13.032922 7.0253906 12.794922 L 7.0097656 12.794922 C 6.9847656 12.908922 6.934375 13.079594 6.859375 13.308594 L 5.7363281 15.703125 L 4 15.703125 L 6.0605469 11.996094 L 4.1757812 8.296875 z M 18 11 L 20 11 L 20 13 L 18 13 L 18 11 z M 18 15 L 20 15 L 20 17 L 18 17 L 18 15 z"/>
-                  </svg>
-                  <v-icon
-                    color="black"
-                  >
-                    arrow_downward
-                  </v-icon>
-                </v-btn>
-              </v-card-actions>
+                </v-card-actions>
               </v-card>
             </v-flex>
         </v-layout>
+          </v-card>
+        </v-flex>
+       </v-layout>
     </v-container>
 </template>
 
@@ -109,6 +132,7 @@ import {Chart} from 'highcharts-vue'
 
 import Highcharts from 'highcharts'
 import exportingInit from 'highcharts/modules/exporting'
+import XLSX  from "xlsx"
 
 exportingInit(Highcharts)
 
@@ -119,12 +143,78 @@ export default {
         start: new Date(),
         end: new Date()
       },
+      start: '',
+      end: '',
       today: moment().format("YYYY-MM-DD"),
       typeLine: '',
       serie: [],
+      chartActions: {
+        title: {
+        text: 'Solar Employment Growth by Sector, 2010-2016'
+    },
+
+    subtitle: {
+        text: 'Source: thesolarfoundation.com'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Number of Employees'
+        }
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            pointStart: 2010
+        }
+    },
+
+    series: [{
+        name: 'Installation',
+        data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
+    }, {
+        name: 'Manufacturing',
+        data: [24916, 24064, 29742, 29851, 32490, 30282, 38121, 40434]
+    }, {
+        name: 'Sales & Distribution',
+        data: [11744, 17722, 16005, 19771, 20185, 24377, 32147, 39387]
+    }, {
+        name: 'Project Development',
+        data: [null, null, 7988, 12169, 15112, 22452, 34400, 34227]
+    }, {
+        name: 'Other',
+        data: [12908, 5948, 8105, 11248, 8989, 11816, 18274, 18111]
+    }],
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+      },
       chartOptionsHistory: {
         chart: {
           type: 'bar',
+          style: {
+            fontFamily: 'serif'
+          }
         },
         title: {
           text: 'Requerimientos Registrados Histórico',
@@ -173,14 +263,13 @@ export default {
           enabled: false,
         },
         lang: {
-        viewFullscreen: 'Ver pantalla grande',
-        printChart: 'Imprimir Gráfico',
-        downloadPNG: 'Descargar PNG imagen',
-        downloadJPEG: 'Descargar JPEG imagen',
-        downloadPDF: 'Descargar PDF documento',
-        downloadSVG: 'Descargar SVG imagen vector',
-        contextButtonTitle: 'Opciones para el gráfico'
-
+          viewFullscreen: 'Ver pantalla grande',
+          printChart: 'Imprimir Gráfico',
+          downloadPNG: 'Descargar PNG imagen',
+          downloadJPEG: 'Descargar JPEG imagen',
+          downloadPDF: 'Descargar PDF documento',
+          downloadSVG: 'Descargar SVG imagen vector',
+          contextButtonTitle: 'Opciones para el gráfico'
         },
         series: [
           {
@@ -199,10 +288,27 @@ export default {
             color: '#EF5350'
           },
         ],
+        responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
       },
       chartOptionsNow: {
         chart: {
-        type: 'column'
+          type: 'column',
+          style: {
+            fontFamily: 'serif'
+          }
         },
         title: {
           text: '',
@@ -243,6 +349,51 @@ export default {
         },
         series: []
       },
+      chartRange: {
+        chart: {
+          type: 'column',
+          style: {
+            fontFamily: 'serif'
+          }
+        },
+        title: {
+          text: ''
+        },
+        subtitle: {
+          text: 'OC Caricuao'
+        },
+        xAxis: {
+            categories: [],
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Requerimientos (%)'
+            }
+        },
+        credits: {
+          enabled: false
+        },
+        lang: {
+          viewFullscreen: 'Ver pantalla grande',
+          printChart: 'Imprimir Gráfico',
+          downloadPNG: 'Descargar PNG imagen',
+          downloadJPEG: 'Descargar JPEG imagen',
+          downloadPDF: 'Descargar PDF documento',
+          downloadSVG: 'Descargar SVG imagen vector',
+          contextButtonTitle: 'Opciones para el gráfico'
+        },
+        tooltip: {
+            pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>',
+            shared: true
+        },
+        plotOptions: {
+            column: {
+                stacking: 'percent'
+            }
+        },
+        series: []
+      },
       registersOcm : [],
       qualityForCategory: null,
       series: []
@@ -250,6 +401,11 @@ export default {
   },
   components: {
     highcharts: Chart 
+  },
+  watch: {
+    selectedDate (val) {
+      this.sendDateRange(val.start, val.end)
+    }
   },
   mounted() {
     /* firebase.database().ref('settings')
@@ -284,6 +440,7 @@ export default {
           this.chartOptionsHistory.xAxis.categories = data.val().requests //Se carga los requerimientos desde los settings
           this.chartOptionsNow.xAxis.categories = data.val().requests //Se carga los requerimientos desde los settings
           this.createdSeries(data.val())
+          //this.loadSeriesForRange(data.val())
           // Se obtiene el historial de la OC Seleccionada para el gráfico Historial
           firebase.database().ref('history')
             .orderByChild('ocm')
@@ -291,15 +448,62 @@ export default {
             .on('value', registers => this.loadRegisterHistory(registers.val()))
         })
       })
+
+      this.sendDateRange(this.today, this.today)
+  },
+  computed: {
+    chartOptionsRange: (data) => data.chartRange
   },
   methods: {
+    sendDateRange(start, end){ 
+      this.start = moment(start).format("YYYY-MM-DD", "00:00:00") 
+      this.end = moment(end).format("YYYY-MM-DD")
+      firebase.database().ref('history')
+      .once('value', () => {
+        firebase.database().ref('settings')
+        .once('value', data => {
+          this.chartRange.xAxis.categories = data.val().requests //Se carga los requerimientos desde los settings
+          this.seriesForRange(data.val())
+        })
+      })
+    },
+    seriesForRange(results){
+        var series = []
+        results.typeLine.forEach((typeLine, index) => {
+          var data = []
+          this.chartRange.xAxis.categories.forEach((categories, i) => {
+          data[i] = 0
+          })
+          firebase.database().ref('history')
+            .orderByChild('date')
+            .startAt(this.start+ ' 00:00:00')
+            .endAt(this.end + ' 23:59:00')
+            .once('value', registers => {
+                for(let key in registers.val()){
+                  if(registers.val()[key].ocm === 'Caricuao' && registers.val()[key].typeLine === typeLine){
+                      this.chartRange.xAxis.categories.forEach((categories, i) => {
+                        if(registers.val()[key].requests.includes(categories)){
+                          data[i]++
+                        }
+                      })
+                    }
+                }
+            })
+            series.push({name: typeLine, data: data})
+        })
+        this.loadSeriesForRange(series)
+    },
+    loadSeriesForRange(series){
+      this.chartRange.title.text = 'Requerimientos Registrados entre ' + this.start + ' - ' + this.end
+      this.chartRange.series = series
+    },
     createdSeries(results){
         var series = []
         results.typeLine.forEach((typeLine, index) => {
           var data = []
           this.chartOptionsNow.xAxis.categories.forEach((categories, i) => {
           data[i] = 0
-        })
+          })
           firebase.database().ref('history')
             .orderByChild('date')
             .startAt(this.today)
@@ -347,6 +551,64 @@ export default {
         this.chartOptionsHistory.series[1].data = qualityForCategoryProcessed
         this.chartOptionsHistory.series[2].data = qualityForCategorySlopes
       }
+    },
+    downloadExcelRange(){
+      var r = []
+      firebase.database().ref('history')
+        .orderByChild('ocm')
+        .equalTo('Caricuao')
+        .once('value', requests => {
+          requests.forEach(request => {
+            if(request.val().date >= this.start + ' 00:00:00' && request.val().date <= this.end + ' 23:59:00'){
+              for(let key in request.val().requests){
+              r.push({
+                "Fecha/Hora": request.val().date,
+                "Línea/# Líneas": request.val().phone,
+                Tecnólogia: request.val().typeLine,
+                "Requerimiento(s)": request.val().requests[key],
+                Estatus: (request.val().statusRequests[key]) ? 'Procesado' : 'Pendiente',
+                Contacto: request.val().contact,
+                Oficina: request.val().ocm,
+                Observaciones: request.val().observations
+              })
+              }
+            }
+          })
+          let data = XLSX.utils.json_to_sheet(r)
+          const workbook = XLSX.utils.book_new()
+          const filename = this.filename
+          XLSX.utils.book_append_sheet(workbook, data, filename)
+          XLSX.writeFile(workbook, `${this.start}_${this.end}.xlsx`)
+        })
+    },
+    downloadExcelNow(){
+      var r = []
+      firebase.database().ref('history')
+        .orderByChild('ocm')
+        .equalTo('Caricuao')
+        .once('value', requests => {
+          requests.forEach(request => {
+            if(request.val().date >= this.today){
+              for(let key in request.val().requests){
+              r.push({
+                "Fecha/Hora": request.val().date,
+                "Línea": request.val().phone,
+                Tecnólogia: request.val().typeLine,
+                "Requerimiento(s)": request.val().requests[key],
+                Estatus: (request.val().statusRequests[key]) ? 'Procesado' : 'Pendiente',
+                Contacto: request.val().contact,
+                Oficina: request.val().ocm,
+                Observaciones: request.val().observations
+              })
+              }
+            }
+          })
+          let data = XLSX.utils.json_to_sheet(r)
+          const workbook = XLSX.utils.book_new()
+          const filename = this.filename
+          XLSX.utils.book_append_sheet(workbook, data, filename)
+          XLSX.writeFile(workbook, `${this.today}.xlsx`)
+        })
     }
   },
   

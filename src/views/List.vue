@@ -24,7 +24,20 @@
                         </v-btn>
                     </v-badge>
                 </v-card-title>
-        <v-layout>
+                <v-layout>
+        <v-flex xs12 md8 offset-md2 py-2>
+          <div>
+            <v-alert
+              v-model="alert"
+              dismissible
+              type="success"
+            >
+              Los cambios han sido guardadas.
+            </v-alert>
+          </div>
+        </v-flex>
+      </v-layout>
+        <v-layout m-4>
             <v-flex>
                 <v-card>
                     <v-card-title>
@@ -45,17 +58,15 @@
                     :search="search"
                     :pagination.sync="pagination"
                     >
-                    <template v-slot:items="props">
+                    <template 
+                        v-slot:items="props" 
+                    >
+                    <tr @click="editItem(props.item)">
                         <td>{{ props.item.detail.date }}</td>
-                        <td>{{ props.item.identify }}</td>
-                        <td>{{ props.item.name }}</td>
-                        <td class="text-xs-left">{{ props.item.detail.requests.join() }}</td>
-                        <td class="text-xs-left">{{ props.item.detail.phone }}</td>
-                        <td class="text-xs-left">{{ props.item.detail.typeLine }}</td>
-                        <td class="text-xs-left">
-                            <span v-if="props.item.status">Procesado</span>
+                         <td class="text-xs-left">
+                            <span v-if="props.item.detail.statusRequests.indexOf(false) === -1">Procesado</span>
                             <span 
-                                v-if="!props.item.status"
+                                v-else
                             >
                                 Pendiente
                                 <strong>
@@ -64,18 +75,17 @@
                                 {{dateRelative(props.item.detail.date)}}
                             </span>
                         </td>
-                        <v-icon
-                    small
-                    class="mr-2"
-                    @click="editItem(props.item)"
-                  >
-                    edit
-                  </v-icon>
+                        <td>{{ props.item.identify }}</td>
+                        <td>{{ props.item.name }}</td>
+                        <td class="text-xs-left">{{ props.item.detail.requests.join() }}</td>
+                        <td class="text-xs-left">{{ props.item.detail.phone }}</td>
+                        <td class="text-xs-left">{{ props.item.detail.typeLine }}</td>
+                        <td class="text-xs-left">{{ props.item.detail.observations }}</td>
+                        <td class="text-xs-left">{{ props.item.detail.update }}</td>
+                    </tr>
                     </template>
                    <template v-slot:no-results>
-                        <v-alert :value="true" color="error" icon="warning">
-                        Your search for "{{ search }}" found no results.
-                        </v-alert>
+                        Sin resultados para "{{ search }}".
                     </template>
                     </v-data-table>
                 </v-card>
@@ -83,7 +93,7 @@
         </v-layout>
         <template>
             <v-layout row justify-center>
-                <v-dialog v-model="changeStatus" persistent max-width="290">
+                <v-dialog v-model="changeStatus" persistent max-width="390">
                 <v-card>
                     <v-card-title class="headline">Cambio de Estatus</v-card-title>
                     <v-card-text>
@@ -108,34 +118,45 @@
                             {{dialogStatus.detail.date}}
                         </span>
                         <v-divider></v-divider>
+                        <v-textarea
+                            box
+                            name="input-7-4"
+                            label="Observaciones"
+                            color="blue"
+                            v-model="dialogStatus.detail.observations"
+                        ></v-textarea>
+                        <v-divider></v-divider>
                         <div class="text-center">
                             <span >
                                 Requerimiento(s)
                             </span>
                         </div>
                         <v-container>
-                            <v-layout wrap>
-                                <v-flex 
-                                    v-for="(request, index) in dialogStatus.detail.requests" 
-                                    :key="index"
-                                    xs12
-                                    class="text-center"
-                                >
-                                    <v-switch
-                                        v-model="dialogStatus.detail.statusRequests[index]"
-                                        :label="request"
-                                        color="deep-orange lighten-1"
+                            <v-layout  
+                                v-for="(request, index) in dialogStatus.detail.requests" 
+                                :key="index"
+                                xs12
+                                class="text-center"
+                                
+                            >
+                               <v-flex xs6 ma-auto>
+                                   <v-switch
+                                    v-model="dialogStatus.detail.statusRequests[index]"
+                                    :label="request"
+                                    color="deep-orange lighten-1"
                                     ></v-switch>
+                               </v-flex>
+                               <v-flex xs6 ma-auto>
                                     <strong class="success--text" v-if="dialogStatus.detail.statusRequests[index]">Procesado</strong>
                                     <strong class="red--text" v-else>Pendiente</strong>
-                                </v-flex>
+                               </v-flex>
                             </v-layout>
                         </v-container>
                     </v-card-text>
                     <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="red darken-1" flat @click="changeStatus = false">Cancelar</v-btn>
-                    <v-btn color="success" flat @click="save(dialogStatus.key, dialogStatus.detail.statusRequests), changeStatus = false">Guardar</v-btn>
+                    <v-btn color="red darken-1" flat @click="changeStatus = false, reload()">Cancelar</v-btn>
+                    <v-btn color="success" flat :disabled="!dialogStatus.detail.observations" @click="save(dialogStatus.key, dialogStatus.detail.statusRequests, dialogStatus.detail.observations), changeStatus = false">Guardar</v-btn>
                     </v-card-actions>
                 </v-card>
                 </v-dialog>
@@ -156,6 +177,8 @@ moment.locale('es')
   export default {
     data () {
       return {
+        today: moment().format("YYYY-MM-DD, h:mm:ss a"),
+        alert: false,
         notifycation: true,
         notifycationCount : 0,
         dialogStatus: {
@@ -179,17 +202,19 @@ moment.locale('es')
         ],
         headers: [
         {
-          text: 'Fecha',
+          text: 'Fecha de Creación',
           align: 'left',
           value: 'date',
           view: true
         },
+        { text: 'Estatus', value: 'status', view: true, sortable: false },
         { text: 'Cédula', value: 'identify', view: true },
         { text: 'Usuario', value: 'name', view: true },
         { text: 'Requerimiento(s)', value: 'requests', view: true },
-        { text: 'Línea/ Cantd. Líneas Nueva', value: 'phone', view: true, sortable: false },
+        { text: 'Línea', value: 'phone', view: true, sortable: false },
         { text: 'Tec.', value: 'typeLine', view: true, sortable: false },
-        { text: 'Estatus', value: 'status', view: true, sortable: false }
+        { text: 'Observaciones', value: 'observations', view: true, sortable: false },
+        { text: 'Ult. Actualización', value: 'update', view: true, sortable: false }
 
       ],
         requests: []
@@ -231,9 +256,20 @@ moment.locale('es')
                     this.cargarData(data.val())
                 })
         },
-        save(key, val){
+        save(key, val, obs){
+            var pending = 0
+            val.forEach(element => {
+                if(!element) pending++
+            });
             firebase.database().ref(`history/${key}/statusRequests`)
                 .set(val)
+            firebase.database().ref(`history/${key}/observations`)
+                .set(obs)
+            firebase.database().ref(`history/${key}/pending`)
+                .set(pending)
+            firebase.database().ref(`history/${key}/update`)
+                .set(this.today)
+            this.alert = true
             this.reload()
         },
         editItem (item) {

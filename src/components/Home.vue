@@ -148,7 +148,7 @@
                         <v-flex xs12 sm6 v-else>
                           <v-text-field 
                             v-model="editedItem.phone" 
-                            label="Cantidad de Líneas" 
+                            label="Línea Nueva" 
                             color="blue"
                             disabled
                           ></v-text-field>
@@ -159,7 +159,7 @@
                             :items="typeLine"
                             label="Tipo de Línea"
                             color="blue"
-                            @blur="changeTypeLine"
+                            @change="changeTypeLine"
                           ></v-select>
                         </v-flex>
                         <v-flex xs12>
@@ -200,6 +200,15 @@
                             persistent-hint
                             color="blue"
                           ></v-select>
+                        </v-flex>
+                        <v-flex xs12>
+                          <v-textarea
+                            box
+                            name="input-7-4"
+                            label="Observaciones"
+                            color="blue"
+                            v-model="editedItem.observations"
+                          ></v-textarea>
                         </v-flex>
                       </v-layout>
                     </v-container>
@@ -327,9 +336,6 @@ import { isNull } from 'util';
 export default {
   mixins: [validationMixin],
 
-  validations: {
-    name: { required, maxLength: maxLength(10) },
-  },
   components: {
     Cleave
   },
@@ -362,7 +368,7 @@ export default {
           view: true
         },
         { text: 'Requerimiento(s)', value: 'requests', view: true },
-        { text: 'Línea/ Cantd. Líneas Nueva', value: 'phone', view: true, sortable: false },
+        { text: 'Línea', value: 'phone', view: true, sortable: false },
         { text: 'Tec.', value: 'typeLine', view: true, sortable: false }
       ],
       records: [],
@@ -377,7 +383,8 @@ export default {
         status: 'Pendiente',
         ocm: '',
         update: '',
-        statusRequests: []
+        statusRequests: [],
+        observations: ''
       },
       defaultItem: {
         date: '',
@@ -389,7 +396,8 @@ export default {
         status: 'Pendiente',
         ocm: '',
         update: '',
-        statusRequests: []
+        statusRequests: [],
+        observations: ''
       },
       ver: 'null',
       step: 1,
@@ -419,8 +427,9 @@ export default {
     },
   computed:{
     requestsDynamic: (data) => {
+      data.editedItem.requests = ''
       if(data.editedItem.new){
-        data.editedItem.phone = '1'
+        data.editedItem.phone = '-'
         return ['Línea Nueva']
       }else{
         data.editedItem.phone = '416'
