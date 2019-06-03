@@ -104,6 +104,7 @@
         { icon: 'home', text: 'Registrar', url: '/' },
         { icon: 'group', text: 'Historial de la OC', url: '/list' },
         { icon: 'insert_chart', text: 'Gráficos', url: '/chart' },
+        { icon: 'event', text: 'Calendario de Eventos', url: '/calendar' },
         { icon: 'settings', text: 'Configuraciones', url: '/settings' },
         { icon: 'help', text: 'Ayuda', url: '/help' }
       ],

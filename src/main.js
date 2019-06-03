@@ -12,10 +12,10 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import VCalendar from 'v-calendar'
 import 'v-calendar/lib/v-calendar.min.css'
 
-
+// Use v-calendar, v-date-picker & v-popover components
 Vue.use(VCalendar, {
   firstDayOfWeek: 2,  // Monday
-});
+})
 
 Vue.config.productionTip = false
 

@@ -30,7 +30,10 @@
       </v-layout>
       <v-layout row wrap>
       <v-flex xs12 md8 offset-md2 mb-3>
-        <v-expansion-panel popout>
+        <v-expansion-panel
+          v-model="panel"
+          expand
+        >
           <v-expansion-panel-content
           >
             <template v-slot:header>
@@ -50,7 +53,7 @@
                       <v-spacer></v-spacer>
                       <v-dialog v-model="dialog" max-width="500px">
                         <template v-slot:activator="{ on }">
-                          <v-btn color="blue" dark class="mb-2" v-on="on" outline>Agregar</v-btn>
+                          <v-btn color="blue" dark class="mb-2" v-on="on" outline @click="newRequest = ''">Agregar</v-btn>
                           <v-btn color="success" dark class="mb-2" @click="saveChange" outline>Guardar</v-btn>
                         </template>
                         <v-card>
@@ -120,10 +123,12 @@
 import firebase from 'firebase'
   export default {
     data: () => ({
+      panel: [true],
       alert: false,
       newRequest: '',
       options: [],
       typeLine: [],
+      face: {},
       dialog: false,
       headers: [
         {
@@ -180,6 +185,9 @@ import firebase from 'firebase'
           firebase.database().ref('settings/options')
             .child(request)
             .set(this.options[key])
+          /* firebase.database().ref('settings/face')
+            .child(request)
+            .set(this.face) */
           })
 
         firebase.database().ref('settings')
@@ -218,6 +226,10 @@ import firebase from 'firebase'
         .once('value', options => {
           this.requests = Object.keys(options.val().options).map(i => i)
           this.options = Object.keys(options.val().options).map(i => options.val().options[i] )
+          this.requests.forEach(request => {
+            this.face = Object.assign(this.face, {[request] : true })
+          })
+          console.log(this.face)
         })
     },
   }

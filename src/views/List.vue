@@ -32,7 +32,7 @@
               dismissible
               type="success"
             >
-              Los cambios han sido guardadas.
+              Los cambios han sido guardadas para {{ userChange }} - {{ identifyChange }}
             </v-alert>
           </div>
         </v-flex>
@@ -177,6 +177,8 @@ moment.locale('es')
   export default {
     data () {
       return {
+        userChange: '',
+        identifyChange: '',
         today: moment().format("YYYY-MM-DD, h:mm:ss a"),
         alert: false,
         notifycation: true,
@@ -257,6 +259,9 @@ moment.locale('es')
                 })
         },
         save(key, val, obs){
+            this.alert = false
+            this.userChange = ''
+            this.identifyChange = ''
             var pending = 0
             val.forEach(element => {
                 if(!element) pending++
@@ -269,8 +274,16 @@ moment.locale('es')
                 .set(pending)
             firebase.database().ref(`history/${key}/update`)
                 .set(this.today)
-            this.alert = true
             this.reload()
+            firebase.database().ref(`userHistory/${key}`)
+                .once('value', identify => {
+                    this.identifyChange = identify.val()
+                    firebase.database().ref(`userData/${this.identifyChange}`)
+                        .once('value', user => {
+                            this.userChange = user.val().name
+                            this.alert = true
+                            })
+                    })
         },
         editItem (item) {
             this.changeStatus = true
