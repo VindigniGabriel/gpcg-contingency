@@ -103,8 +103,9 @@
       items: [
         { icon: 'home', text: 'Registrar', url: '/' },
         { icon: 'group', text: 'Historial de la OC', url: '/list' },
+        { icon: 'event', text: 'Gestión de citas', url: '/quote' },
         { icon: 'insert_chart', text: 'Gráficos', url: '/chart' },
-        { icon: 'event', text: 'Calendario de Eventos', url: '/calendar' },
+        { icon: 'timer', text: 'Disponibilidad de los aplicativos', url: '/calendar' },
         { icon: 'settings', text: 'Configuraciones', url: '/settings' },
         { icon: 'help', text: 'Ayuda', url: '/help' }
       ],

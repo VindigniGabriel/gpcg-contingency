@@ -52,6 +52,14 @@ export default new Router({
       // this generates a separate chunk (calendar.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "calendar" */ './views/Calendar.vue')
+    },
+    {
+      path: '/quote',
+      name: 'quote',
+      // route level code-splitting
+      // this generates a separate chunk (quote.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import(/* webpackChunkName: "quote" */ './views/Quote.vue')
     }
   ]
 })

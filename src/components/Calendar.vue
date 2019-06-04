@@ -1,3 +1,4 @@
+
 <template>
     <v-container>
         <v-layout>
@@ -10,7 +11,7 @@
                         <v-icon>
                             event
                         </v-icon>
-                        Calendario de Eventos
+                        Disponibilidad de Aplicativos
                         </h3>
                     </div>
                     </v-card-title>
@@ -18,18 +19,10 @@
                             <v-layout wrap>
                                 <v-flex xs12 sm4>
                                     <v-card>
-                                        <v-toolbar color="teal" dark>
+                                        <v-toolbar color="grey lighten-1">
 
                                         <v-toolbar-title class="text-xs-center">Aplicaciones</v-toolbar-title>
-
-                                        <v-spacer></v-spacer>
-
-                                        <v-btn 
-                                        icon
-                                        @click.stop="dialogEvent = true"
-                                        >
-                                            <v-icon>add</v-icon>
-                                        </v-btn>
+                                        
                                         </v-toolbar>
 
                                         <v-list subheader>
@@ -66,9 +59,8 @@
                                 </v-flex>
                                 <v-flex xs12 sm8>
                                     <v-tabs
-                                    color="cyan"
-                                    dark
-                                    slider-color="yellow"
+                                    color="grey lighten-1"
+                                    slider-color="deep-orange darken-1"
                                     >
                                         <v-tab
                                             v-for="aplication in aplications"
@@ -85,7 +77,8 @@
                                             <v-card flat>
                                             <v-card-text>
                                                 <vue-cal
-                                                    small 
+                                                    default-view="day"
+                                                    xsmall 
                                                     :selected-date="today"
                                                     :time-from="8 * 60"
                                                     :time-to="18 * 60"
@@ -201,11 +194,12 @@ export default {
         ini () {
             this.events = ''
             firebase.database().ref('events')
-                .on('value', s =>  this.events = s.val())
-
-            this.aplications.forEach((aplication, i) => {
-                    var key = this.events[aplication.key].length - 1
+                .on('value', s => { 
+                    this.events = s.val()
+                     this.aplications.forEach((aplication, i) => {
+                    var key = this.events[aplication.key].length -1
                     this.aplications[i].active = this.events[aplication.key][key].active
+                    })
                 })
         },
         onEventClick (event, e) {
@@ -272,12 +266,11 @@ export default {
             setInterval(() => {
                 this.aplications.forEach(aplication => {
                     var key = this.events[aplication.key].length - 1
-                    console.log(key)
                     this.events[aplication.key][key].end = moment().format("YYYY-MM-DD HH:mm:ss")
                     firebase.database().ref('events')
                         .set(this.events)
                 })
-		    }, 300000)
+            }, 1000000)
         }
     }, 
     mounted() {
